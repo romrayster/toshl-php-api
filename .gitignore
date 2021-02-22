@@ -1,1 +1,4 @@
 credentials.txt
+google-sheets/credentials.json
+!google-sheets/*
+!google-sheets/google-api-php-client/

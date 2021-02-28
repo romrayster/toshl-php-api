@@ -74,7 +74,7 @@ function get_toshl_rules()
 
 
     $spreadsheetId = getSpreadSheetId();
-    $range = 'A2:I';
+    $range = 'A3:L';
     $response = $service->spreadsheets_values->get($spreadsheetId, $range);
     $values = $response->getValues();
     $rules=array();

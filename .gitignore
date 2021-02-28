@@ -3,3 +3,5 @@ google-sheets/credentials.json
 google-sheets/google-api-php-client/
 google-sheets/token.json
 .vscode/
+token.json
+token.json

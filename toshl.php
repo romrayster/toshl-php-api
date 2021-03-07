@@ -78,63 +78,36 @@ function list_accounts()
     curl_close($ch);
     return $output;
 }
-/**
- * @brief function which checks wether the rule object imported from Google Sheets is correct
- * @param rule an array which is supposed to have at least index 5 or index 6 defined with a category or tag
- * @return object as follows:
- * {
- *     valid_rule=>true|false,
- *     category_defined=>true|false,
- *     tags_defined=>true|false,
- * }
- */
-function check_rule_object($rule)
-{
-    /**Tags come an index 6, check if tags are defined */
 
-    $check_rule_object = (object)[
-        "valid_rule" => false,
-        "category_defined" => false,
-        "tags_defined" => false
-    ];
-    if (count($rule) > 6) {
-        if (!empty(trim($rule[6])) || !empty(trim($rule[5]))) {
-            $check_rule_object->valid_rule = true;
-        }
-        if (!empty(trim($rule[6]))) {
-            $check_rule_object->tags_defined = true;
-        }
-        if (!empty(trim($rule[5]))) {
-            $check_rule_object->category_defined = true;
-        }
-    }
-    /**Check if categoreis are defined */
-    else if (count($rule) > 5) {
-        if (!empty($rule[5])) {
-            $check_rule_object->valid_rule = true;
-            $check_rule_object->category_defined = true;
-        }
-    }
-    
-    if($check_rule_object->valid_rule ){
-        echo("Valid Rule \n");
-    }
-    else{
-        print_r("Invalid Rule \n");
-    }
-    return $check_rule_object;
-}
 $accesstoken = get_accesstoken();
+
+
 $entries = list_entries();
 $rules = get_toshl_rules();
 $rule_match = array();
 $errors = array();
+/**Array which has all */
+$valid_rules = array();
+
+/**Check if rules comply with the right standard and push to valid_rules array*/
+$index=0;
+$google_table_offset=3;
+foreach ($rules as $rule) {
+    $valid_rule=check_rule_object($rule);
+    if($valid_rule->valid_rule){
+        array_push($valid_rules,$valid_rule);
+    }
+    else{
+        $row=$index+$google_table_offset;
+        $error_message=$valid_rule->error_message."  Error at Google Sheet Rule Table at row " . $row;
+        array_push($errors,$error_message);
+    }
+    $index=$index+1;
+}
 /**We go through all the entries and check if any of the rules matches.  */
 foreach ($entries as $entry) {
     //print_r($entry->desc . "\t" . $entry->amount . "\t" . $entry->id . "\n");
-    /**Check if rules comply with the right standard */
-    foreach ($rules as $rule) {
-        check_rule_object($rule);
-        
+    foreach($valid_rules as $valid_rule){
+        $test="";
     }
 }

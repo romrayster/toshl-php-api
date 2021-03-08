@@ -113,15 +113,23 @@ function check_rule_object($rule)
         "numeric_condition" => false,
         "rule" => $rule,
     ];
-    if (count($rule) > 6) {
-        if (!empty(trim($rule[6])) || !empty(trim($rule[5]))) {
+    if (count($rule) > 7) {
+        /**If categories or tags are defined, rule is valid */
+        if (!empty(trim($rule[7])) || !empty(trim($rule[6])) || !empty(trim($rule[5]))) {
             $check_rule_object->valid_rule = true;
         }
-        if (!empty(trim($rule[6]))) {
+        /**If just tags are defined rule is valid */
+        if (!empty(trim($rule[7])) || !empty(trim($rule[6]))) {
             $check_rule_object->tags_defined = true;
         }
+        /**If just a category is defined, rule is valud */
         if (!empty(trim($rule[5]))) {
             $check_rule_object->category_defined = true;
+        }
+        /**If a category tag is defined but no category, rule is invalid.*/
+        if (!empty(trim($rule[7])) && empty(trim($rule[5]))) {
+            $check_rule_object->valid_rule = false;
+            $check_rule_object->error_message = "Category tags are defined but no category given.";
         }
     }
     /**Check if categoreis are defined */
@@ -162,7 +170,9 @@ function check_rule_object($rule)
             print_r($rule); */
             $check_rule_object->error_message = "Rule has no matching criteria.";
         }
-    } else {
+    } 
+    /**Give this error only if a previous error has not been yet defined. */
+    else if (!$check_rule_object->error_message) {
         /*         print_r("Invalid rule because it does not contain neither tags nor categories. Rule: \n");
         print_r($rule); */
         $check_rule_object->error_message = "Invalid rule because it does not contain neither tags nor categories.";
@@ -325,7 +335,9 @@ function entry_matches_rule($valid_rule, $entry)
 function get_changing_entries($entries, $rules)
 {
     /**Array which has all valid rules and some extra info about the rule.*/
+    global $errors;
     $valid_rules = array();
+
     /**Check if rules comply with the right standard and push to valid_rules array*/
     $index = 0;
     $google_table_offset = 3;
